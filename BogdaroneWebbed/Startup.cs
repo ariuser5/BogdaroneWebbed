@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using BogdaroneWebbed.Controllers;
 
 namespace BogdaroneWebbed
 {
@@ -15,7 +16,7 @@ namespace BogdaroneWebbed
 	{
 		public Startup(IConfiguration configuration)
 		{
-			Configuration = configuration;
+			this.Configuration = configuration;
 		}
 
 		public IConfiguration Configuration { get; }
@@ -36,18 +37,53 @@ namespace BogdaroneWebbed
 				// The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
 				app.UseHsts();
 			}
+
 			app.UseHttpsRedirection();
 			app.UseStaticFiles();
-
 			app.UseRouting();
-
 			app.UseAuthorization();
-
-			app.UseEndpoints(endpoints => {
-				endpoints.MapControllerRoute(
-					name: "default",
-					pattern: "{controller=Home}/{action=Index}/{id?}");
-			});
+			app.UseEndpoints(BuildEndpoints);
 		}
+
+		static void BuildEndpoints(
+			Microsoft.AspNetCore.Routing.IEndpointRouteBuilder builder)
+		{
+			builder.MapControllerRoute(
+				name: "HomePage",
+				pattern: nameof(HomeController.Home).ToLower(),
+				defaults: new { 
+					controller=Utils.NameOfController(typeof(HomeController)),
+					action=nameof(HomeController.Home)});
+
+			builder.MapControllerRoute(
+				name: "ProductsPage",
+				pattern: nameof(ProductsController.Products).ToLower(),
+				defaults: new { 
+					controller=Utils.NameOfController(typeof(ProductsController)), 
+					action=nameof(ProductsController.Products)});
+
+			builder.MapControllerRoute(
+				name: "ContactPage",
+				pattern: nameof(ContactController.Contact).ToLower(),
+				defaults: new { 
+					controller=Utils.NameOfController(typeof(ContactController)),
+					action=nameof(ContactController.Contact)});
+
+			builder.MapControllerRoute(
+				name: "default",
+				pattern: "/",
+				defaults: new { 
+					controller=Utils.NameOfController(typeof(HomeController)),
+					action=nameof(HomeController.Index)});
+
+			builder.MapControllers();
+
+			//builder.MapControllerRoute(
+			//	name: "default",
+			//	pattern: "{controller=Home}/{action=Index}/{id?}");
+			
+		}
+
+
 	}
 }

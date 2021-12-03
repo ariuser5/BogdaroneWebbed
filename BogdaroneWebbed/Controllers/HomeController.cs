@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using BogdaroneWebbed.Models;
+using BogdaroneWebbed.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
@@ -15,23 +16,39 @@ namespace BogdaroneWebbed.Controllers
 
 		public HomeController(ILogger<HomeController> logger)
 		{
-			_logger = logger;
+			this._logger = logger;
 		}
 
 		public IActionResult Index()
 		{
-			return View();
+			return this.RedirectToAction(nameof(Home));
 		}
 
-		public IActionResult Privacy()
+		public IActionResult Home()
 		{
-			return View();
+			var company = DataBase.GetCompanyInfo();
+			var viewModel = new HomePageViewModel(company);
+
+			return this.View("Views/Home.cshtml", viewModel);
 		}
 
-		[ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+		[ResponseCache(
+			Duration = 0, 
+			Location = ResponseCacheLocation.None,
+			NoStore = true)]
 		public IActionResult Error()
 		{
-			return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+			var company = DataBase.GetCompanyInfo();
+			var error = new RequestError()
+			{
+				RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier
+			};
+
+			var viewModel = new ErrorViewModel(company, error);
+
+			return this.View(viewModel);
 		}
+
+
 	}
 }

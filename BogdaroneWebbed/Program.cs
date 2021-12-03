@@ -13,7 +13,10 @@ namespace BogdaroneWebbed
 	{
 		public static void Main(string[] args)
 		{
-			CreateHostBuilder(args).Build().Run();
+			var hostBuilder = CreateHostBuilder(args);
+			var hostApp = hostBuilder.Build();
+
+			hostApp.Run();
 		}
 
 		public static IHostBuilder CreateHostBuilder(string[] args) =>
@@ -21,5 +24,7 @@ namespace BogdaroneWebbed
 				.ConfigureWebHostDefaults(webBuilder => {
 					webBuilder.UseStartup<Startup>();
 				});
+
+
 	}
 }
